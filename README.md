@@ -2,7 +2,7 @@
 
 An end-to-end time series forecasting project predicting daily sales for a retail superstore, from raw data cleaning through model deployment.
 
-**Live app:** _add your Streamlit Cloud link here after deployment_
+**Live app:** https://salesforecastingapp-9ist53tckbbaplk7vbs688.streamlit.app/
 **Dataset:** [Superstore Sales Dataset (Kaggle)](https://www.kaggle.com/datasets/rohitsahoo/sales-forecasting)
 
 ---
