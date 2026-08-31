@@ -1,1 +1,1 @@
-["Year", "Month", "Quarter", "Month_sin", "Month_cos", "Sales_lag_1", "Sales_lag_2", "Sales_lag_3", "Sales_lag_12", "Rolling_mean_3", "Rolling_std_3", "Rolling_mean_6", "Pct_change_1", "Diff_1"]
+["Year", "Month", "Quarter", "Month_sin", "Month_cos", "Sales_lag_1", "Sales_lag_2", "Sales_lag_3", "Sales_lag_12", "Rolling_mean_3", "Rolling_std_3", "Rolling_mean_6", "Pct_change_1", "Diff_1", "IsHoliday"]

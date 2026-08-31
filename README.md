@@ -1,8 +1,8 @@
-# Sales Forecasting : Superstore Dataset
+# Sales Forecasting — Superstore Dataset
 
 An end-to-end time series forecasting project predicting daily sales for a retail superstore, from raw data cleaning through model deployment.
 
-**Live app:** https://salesforecastingapp-9ist53tckbbaplk7vbs688.streamlit.app/
+**Live app:** _add your Streamlit Cloud link here after deployment_
 **Dataset:** [Superstore Sales Dataset (Kaggle)](https://www.kaggle.com/datasets/rohitsahoo/sales-forecasting)
 
 ---
@@ -66,9 +66,19 @@ The goal was to forecast daily sales using historical transaction data, comparin
 | SARIMA (untuned) | 15,126.15 | 20,098.40 | 20.18% |
 | SARIMA (tuned) | 26,205.41 | 34,874.12 | 30.43% |
 
+## Business Insights
+
+Tied directly back to the original problem — overestimating demand raises holding costs, underestimating causes stockouts and lost revenue:
+
+- **Q4 buffer stock:** Sales consistently spike in November/December. Inventory buffers should be increased ahead of this window rather than relying on average monthly ordering, to avoid stockouts during peak demand.
+- **March as a secondary peak:** A smaller but repeatable spike around March suggests a second restocking checkpoint outside the obvious holiday season.
+- **Category prioritization:** Technology (particularly Phones) drives the largest share of revenue, followed by Furniture. Forecast accuracy and stock precision matter most for this category — a stockout here carries more revenue risk than in lower-volume categories.
+- **Holiday effect:** Comparing average sales on Nigeria holiday dates vs. non-holiday dates shows.
+- **Forecast reliability window:** Because forecasts beyond ~7-10 days are generated recursively, business planning should treat short-horizon forecasts (next 1-2 weeks) as the most actionable, and longer-horizon forecasts as directional guidance only.
+
 ## Model Selection: Why XGBoost (Untuned)
 
-Linear Regression scored best on the single test split, but performed worst and most erratically across 5-fold cross-validation a strong signal it overfit to that particular train/test boundary rather than generalizing. XGBoost was the most consistent performer across every CV fold, and its performance barely changed under hyperparameter tuning, indicating a stable, low-variance model rather than one whose apparent accuracy depends on a lucky split.
+Linear Regression scored best on the single test split, but performed worst and most erratically across 5-fold cross-validation, a strong signal it overfit to that particular train/test boundary rather than generalizing. XGBoost was the most consistent performer across every CV fold, and its performance barely changed under hyperparameter tuning, indicating a stable, low-variance model rather than one whose apparent accuracy depends on a lucky split.
 
 SARIMA's tuned result was dramatically worse than its untuned baseline, most likely because the hyperparameter search overfit to the limited CV folds available for a time series problem.
 
@@ -85,10 +95,17 @@ SARIMA's tuned result was dramatically worse than its untuned baseline, most lik
 ```
 ├── app.py                              # Streamlit app
 ├── model_utils.py                      # Feature-generation logic used at inference time
+├── save_model.py                       # Script to retrain and export deployment artifacts
 ├── sales_forecast_xgb_model.pkl        # Trained XGBoost model
 ├── feature_cols.json                   # Feature column list used by the model
 ├── historical_sales_for_inference.csv  # Historical daily sales, used to seed lag/rolling features
-├── requirements.txt
+├── model_meta.json                     # Residual std used for prediction intervals
+├── forecast_log.csv                    # Auto-generated log of forecast requests (created on first run)
+├── requirements.txt                    # Dependencies for running the app
+├── requirements-notebooks.txt          # Dependencies for running the notebooks
+├── notebooks/                          # EDA, feature engineering, and modelling notebooks
+├── data/                               # Dataset or a link to it (train.csv)
+├── project_report.pdf                  # 5+ page written report (see submission requirements)
 └── README.md
 ```
 
@@ -106,7 +123,7 @@ streamlit run app.py
 1. Push this repository to GitHub (include the `.pkl`, `.json`, and `.csv` files — do not gitignore them, the app needs them)
 2. Go to [share.streamlit.io](https://share.streamlit.io) and sign in with GitHub
 3. Click **New app**, select your repository, branch, and set the main file path to `app.py`
-4. Click **Deploy**  the first build installs `requirements.txt` and may take a few minutes
+4. Click **Deploy** — the first build installs `requirements.txt` and may take a few minutes
 5. Once live, copy the app URL into the "Live app" line at the top of this README
 
 ## Tech Stack
