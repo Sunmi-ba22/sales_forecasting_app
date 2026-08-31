@@ -8,6 +8,17 @@ receives inputs in the same shape/format it was trained on.
 
 import numpy as np
 import pandas as pd
+import holidays
+
+_US_HOLIDAYS_CACHE = {}
+
+
+def _is_holiday(target_date):
+    """Cache the holidays.US() lookup per year to avoid rebuilding it on every call."""
+    year = target_date.year
+    if year not in _US_HOLIDAYS_CACHE:
+        _US_HOLIDAYS_CACHE[year] = holidays.US(years=[year])
+    return int(target_date in _US_HOLIDAYS_CACHE[year])
 
 
 def build_features_for_date(target_date, history_df, feature_cols):
@@ -39,6 +50,7 @@ def build_features_for_date(target_date, history_df, feature_cols):
     row['Month_cos'] = np.cos(2 * np.pi * target_date.month / 12)
     row['DayOfWeek'] = target_date.dayofweek
     row['IsWeekend'] = int(target_date.dayofweek in [5, 6])
+    row['IsHoliday'] = _is_holiday(target_date)
 
     hist = history_df.sort_values('Date').set_index('Date')['Sales']
 
@@ -75,7 +87,7 @@ def build_features_for_date(target_date, history_df, feature_cols):
     return features[feature_cols]
 
 
-def forecast_n_days(model, history_df, feature_cols, n_days):
+def forecast_n_days(model, history_df, feature_cols, n_days, residual_std=None):
     """
     Recursively forecast `n_days` ahead of the last date in history_df.
 
@@ -84,9 +96,20 @@ def forecast_n_days(model, history_df, feature_cols, n_days):
     forecast error compounds with horizon length — accuracy degrades the
     further out the forecast goes (see README limitations).
 
+    Parameters
+    ----------
+    residual_std : float, optional
+        Standard deviation of the model's test-set residuals (computed
+        once at training time and saved — see save_model.py). If given,
+        a 90% prediction interval (+/- 1.645 * residual_std) is added to
+        every forecasted row. This is a simple residual-based interval,
+        not a rigorously calibrated one — its actual coverage should be
+        checked against held-out data (see README).
+
     Returns
     -------
-    pd.DataFrame with columns ['Date', 'Predicted_Sales']
+    pd.DataFrame with columns ['Date', 'Predicted_Sales'] and, if
+    residual_std is provided, ['Lower_90', 'Upper_90'].
     """
     hist = history_df[['Date', 'Sales']].copy()
     hist['Date'] = pd.to_datetime(hist['Date'])
@@ -97,7 +120,11 @@ def forecast_n_days(model, history_df, feature_cols, n_days):
         target_date = last_date + pd.Timedelta(days=i)
         X_new = build_features_for_date(target_date, hist, feature_cols)
         pred = float(model.predict(X_new)[0])
-        forecasts.append({'Date': target_date, 'Predicted_Sales': pred})
+        row = {'Date': target_date, 'Predicted_Sales': pred}
+        if residual_std is not None:
+            row['Lower_90'] = pred - 1.645 * residual_std
+            row['Upper_90'] = pred + 1.645 * residual_std
+        forecasts.append(row)
         hist = pd.concat(
             [hist, pd.DataFrame([{'Date': target_date, 'Sales': pred}])],
             ignore_index=True
