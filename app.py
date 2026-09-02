@@ -40,7 +40,7 @@ def log_forecast_request(n_months, forecast_df):
 
 st.set_page_config(page_title="Sales Forecasting", page_icon="📈", layout="centered")
 
-st.title("📈 Sales Forecasting")
+st.title(" Sales Forecasting")
 st.caption(
     "Tuned XGBoost model trained on monthly Superstore sales (Jan 2016-Dec 2018). "
     "Forecasts are generated recursively month-by-month, so accuracy is highest "
@@ -95,8 +95,8 @@ comparison_df = pd.DataFrame({
 st.dataframe(comparison_df, use_container_width=True, hide_index=True)
 st.caption(
     "Linear Regression is excluded from this comparison: it produced a near-zero "
-    "error on this dataset, which reflects overfitting (too many features relative "
-    "to only 28 training rows) rather than genuine forecasting skill."
+    "error on this dataset, which reflects overfitting"
+    "rather than genuine forecasting skill."
 )
 
 st.subheader("Generate a Forecast")
