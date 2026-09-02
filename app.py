@@ -106,12 +106,14 @@ if st.button("Generate Forecast", type="primary"):
     try:
         with st.spinner("Forecasting..."):
             forecast_df = forecast_n_months(model, history, feature_cols, n_months, residual_std)
+            st.info(interpret_forecast(history, forecast_df))
+
     except ValueError as e:
         st.error(f"Could not generate forecast: {e}")
         st.stop()
 
     log_forecast_request(n_months, forecast_df)
-
+    
     st.success(f"Forecast generated for {n_months} month(s) ahead.")
 
     chart_df = history[["Date", "Sales"]].tail(12).rename(columns={"Sales": "Actual"})
