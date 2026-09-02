@@ -137,6 +137,15 @@ if st.button("Generate Forecast", type="primary"):
     csv_bytes = forecast_df.to_csv(index=False).encode("utf-8")
     st.download_button("Download forecast as CSV", csv_bytes, "sales_forecast.csv", "text/csv")
 
+
+def interpret_forecast(history, forecast_df):
+    last_actual = history['Sales'].iloc[-1]
+    first_pred = forecast_df['Predicted_Sales'].iloc[0]
+    last_pred = forecast_df['Predicted_Sales'].iloc[-1]
+    pct_change = ((last_pred - last_actual) / last_actual) * 100
+    direction = "rising" if last_pred > first_pred else "falling" if last_pred < first_pred else "flat"
+    return f"Sales are trending **{direction}** over this forecast, moving from **{last_actual:,.0f}** (last known month) to **{last_pred:,.0f}** by the end of the horizon — a **{pct_change:+.1f}%** change."
+
 st.divider()
 st.caption(
     "Model: XGBoost Regressor (tuned: n_estimators=500, max_depth=3, learning_rate=0.05, "
