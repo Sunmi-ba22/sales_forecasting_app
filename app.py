@@ -271,9 +271,9 @@ def log_forecast(forecast_df, n_months):
 # App layout
 # --------------------------------------------------------------------------
 
-st.title("📈 Nova Mart Ltd — Sales Forecasting")
+st.title(" Nova Mart Ltd — Sales Forecasting")
 st.caption(
-    "Tuned XGBoost model (MAE $10,790 · MAPE 13.65% on held-out test months). "
+    "Tuned XGBoost model (MAE 10,790 · MAPE 13.65% on held-out test months). "
     "Forecasts are generated recursively month-by-month, so accuracy is highest "
     "in the first 1-3 months and becomes more directional further out."
 )
