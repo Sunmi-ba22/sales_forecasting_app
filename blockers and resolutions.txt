@@ -1,5 +1,5 @@
 SALES FORECASTING PROJECT — BLOCKERS AND RESOLUTIONS
-Nova Mart Ltd Sales Forecasting Project
+Sales Forecasting Project
 
 1. Blocker: Searching for the right dataset to use
    Resolution: Explored multiple website options before settling on the Kaggle Superstore Sales Dataset.
