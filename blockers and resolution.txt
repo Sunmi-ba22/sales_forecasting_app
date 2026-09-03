@@ -1,3 +1,1 @@
-while trying to deploy the models built, i encountersd a blocker while tring to commit the folder to the repo
 
-i had assistance from a member of my team
