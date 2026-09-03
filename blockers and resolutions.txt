@@ -1,0 +1,41 @@
+SALES FORECASTING PROJECT — BLOCKERS AND RESOLUTIONS
+Nova Mart Ltd Sales Forecasting Project
+
+1. Blocker: Searching for the right dataset to use
+   Resolution: Explored multiple website options before settling on the Kaggle Superstore Sales Dataset.
+
+2. Blocker: Encountered an error during EDA due to datetime issues
+   Resolution: Had help from a team member.
+
+3. Blocker: Discovered data leakage when training the model
+   Resolution: Dropped the features causing the data leakage and trained on the remaining features.
+
+4. Blocker: Committing the project to my GitHub repo
+   Resolution: Uploaded the files and folders manually without the terminal.
+
+5. Blocker: Running the modelling notebook with features.csv
+   Resolution: Used the correct file path instead of a relative path.
+
+6. Blocker: Attempted to aggregate the dataset to weekly grain, and ran into multiple issues at once — data leakage, infinite values in some features, null values in some features, and some cells unable to run due to zero-division errors
+   Resolution: Aggregated the data to monthly instead. This reduced the dataset drastically (down to 36 monthly rows), which introduced a new problem — models began overfitting and producing poor results on such a small dataset.
+
+7. Blocker: The IsHoliday feature was constant at 0 across all 36 monthly rows, contributing nothing to the model, because it checked for an exact date match rather than whether the month contained a holiday at all
+   Resolution: Rewrote the flag to check whether any date within the month fell on a public holiday, rather than matching a specific date. After the fix, holiday months showed a clear sales difference (avg. $53,717 vs. $41,038 for non-holiday months), and the feature contributed meaningfully to the final model.
+
+8. Blocker: Linear Regression showed near-zero MAE on both the single test split and cross-validation — an unrealistic result caused by overfitting/data leakage from having too many correlated engineered features relative to only 28 training rows
+   Resolution: Excluded Linear Regression from the valid model comparison and flagged it as unreliable rather than reporting it as the "best" model, since a genuinely near-perfect result on that little data was a red flag, not a win.
+
+9. Blocker: SARIMA hyperparameter tuning used an incorrect seasonal period (m=7, a weekly cycle) on monthly data, causing the tuned SARIMA model to perform far worse than the untuned version
+   Resolution: Identified the mismatch and flagged m=12 (annual seasonality) as the correct seasonal period for monthly data, to be used in any future retuning attempt.
+
+10. Blocker: A copy-paste bug in the cross-validation summary code caused Random Forest's Mean MAPE to display as a meaningless near-zero value, because the column was pulling from the Linear Regression MAPE results instead of Random Forest's own
+    Resolution: Identified and flagged the bug; Random Forest's Mean MAE remained valid and usable, but its Mean MAPE was excluded from reporting until the code is corrected.
+
+11. Blocker: The deployed Streamlit app (app.py) crashed with a NameError related to model_meta.json
+    Resolution: Fixed the missing/incorrect variable reference so the app could correctly load the model's saved metadata (used for prediction intervals).
+
+12. Blocker: Inference-time features in the deployed app didn't match the features the model was trained on — Diff_1 and Pct_change_1 were missing entirely, and their training-time versions relied on the target month's own Sales value, which isn't available yet at the point of prediction
+    Resolution: Redefined these two features for live inference so they're computed only from prior lag values, keeping them leak-free while still giving the model equivalent signal.
+
+13. Blocker: The model-saving cell in the modelling notebook was retraining and saving the untuned XGBoost model instead of the tuned one, and had stopped saving model_meta.json and residual_std — leaving the deployed app out of sync with the actual best-performing model
+    Resolution: Flagged the mismatch so the saved model artifact can be corrected to match the tuned XGBoost model actually reported as best in the results.
